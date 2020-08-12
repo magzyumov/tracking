@@ -13,11 +13,10 @@ interface IMainContract: IBaseContract.View {
     }
 
     interface Presenter: IBaseContract.Presenter<View> {
-        fun init()
         fun getCoordinates()
         fun startTracking()
         fun switchTracking()
-        fun getTracking(): Boolean
+        fun getTrackingStatus(): Boolean
     }
 
 }

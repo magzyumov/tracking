@@ -1,4 +1,4 @@
-package ru.magzyumov.coordinates
+package ru.magzyumov.coordinates.util
 
 import com.google.android.gms.maps.model.LatLng
 import java.lang.Math.*

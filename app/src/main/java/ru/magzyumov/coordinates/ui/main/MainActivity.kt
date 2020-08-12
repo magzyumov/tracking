@@ -1,10 +1,10 @@
 package ru.magzyumov.coordinates.ui.main
 
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -14,14 +14,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_main.*
-import ru.magzyumov.coordinates.LatLngInterpolator
+import ru.magzyumov.coordinates.util.LatLngInterpolator
 import ru.magzyumov.coordinates.R
 import ru.magzyumov.coordinates.model.Coordinates
 import ru.magzyumov.coordinates.model.Coordinates.Coordinate
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback,
-    View.OnClickListener, IMainContract.View {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, 
+    GoogleMap.OnMapClickListener, IMainContract.View {
 
     private lateinit var map: GoogleMap
     private var presenter: IMainContract.Presenter? = null
@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         (presenter as MainPresenter).attachView(this)
 
         if (presenter != null) {
-            presenter!!.init()
             presenter!!.getCoordinates()
         }
 
@@ -46,15 +45,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        textViewSpeed.setOnClickListener(this)
         textViewSpeed.text = "Подготовка данных..."
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map.setOnMapClickListener(this)
     }
 
-    private fun drawLine() {
+    private fun drawRoute() {
         val line = PolylineOptions()
         line.width(8f).color(R.color.colorAccent)
         val latLngBuilder = LatLngBounds.Builder()
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         map.moveCamera(track);
     }
 
-    private fun animateMarkerToGB(marker: Marker, finalPosition: LatLng) {
+    private fun moveMarker(marker: Marker, finalPosition: LatLng) {
         val latLngInterpolator: LatLngInterpolator = LatLngInterpolator.Spherical()
         val startPosition = marker.position
         val handler = Handler()
@@ -87,17 +86,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             var t = 0f
             var v = 0f
             override fun run() {
-                // Calculate progress using interpolator
                 elapsed = SystemClock.uptimeMillis() - start
                 t = elapsed / durationInMs
                 v = interpolator.getInterpolation(t)
                 marker.position = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 17f));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 20f));
 
-                // Repeat till progress is complete.
                 if (t < 1) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, 16)
+                    handler.postDelayed(this, 10)
                 }
             }
         })
@@ -107,23 +103,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         coordinates = _coordinates
         progressBar.visibility = GONE
         mapFrame.visibility = VISIBLE
-        drawLine()
+        drawRoute()
+        textViewSpeed.text = "Маршрут готов!"
     }
 
     override fun showMessage(message: String) {
         Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun genNewPoint(coordinate: Coordinate) {
-        animateMarkerToGB(startMarker, coordinate.getPoint())
+        moveMarker(startMarker, coordinate.getPoint())
+        textViewSpeed.text = "Скорость: " + coordinate.getSpeed() + " м/ч"
     }
-
-    override fun onClick(p0: View?) {
-        if (!presenter?.getTracking()!!) {
+    
+    override fun onMapClick(p0: LatLng?) {
+        if (!presenter?.getTrackingStatus()!!) {
             presenter?.startTracking()
         }
 
         presenter?.switchTracking()
     }
+
 }
 
