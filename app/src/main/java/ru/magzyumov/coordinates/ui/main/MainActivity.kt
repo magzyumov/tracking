@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        mapFrame.setOnClickListener(this)
+        textViewSpeed.setOnClickListener(this)
+        textViewSpeed.text = "Подготовка данных..."
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -62,7 +63,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 val startMarkerOptions = MarkerOptions()
                     .position(coordinates.getCoordinates()[i].getPoint())
                     .title(coordinates.getCoordinates()[i].getTimeStamp())
-                    //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher))
                 startMarker = map.addMarker(startMarkerOptions)
             }
             line.add(coordinates.getCoordinates()[i].getPoint())
@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val latLngBounds = latLngBuilder.build()
         val track = CameraUpdateFactory.newLatLngBounds(latLngBounds, size, size, 25)
         map.moveCamera(track);
-        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates.getCoordinates()!![0].getPoint(),12f));
     }
 
     private fun animateMarkerToGB(marker: Marker, finalPosition: LatLng) {
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 t = elapsed / durationInMs
                 v = interpolator.getInterpolation(t)
                 marker.position = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 12f));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 20f));
 
                 // Repeat till progress is complete.
                 if (t < 1) {
@@ -117,11 +116,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun genNewPoint(coordinate: Coordinate) {
         animateMarkerToGB(startMarker, coordinate.getPoint())
+        println(coordinate.getTimeStamp())
     }
 
     override fun onClick(p0: View?) {
-        presenter?.startTracking()
-        presenter?.switchTracking(false)
+        if (!presenter?.getTracking()!!) {
+            presenter?.startTracking()
+        }
+
+        presenter?.switchTracking()
     }
 }
 

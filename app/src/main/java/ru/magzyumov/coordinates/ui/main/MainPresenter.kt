@@ -1,7 +1,5 @@
 package ru.magzyumov.coordinates.ui.main
 
-
-
 import com.google.android.gms.maps.model.LatLng
 import hu.akarnokd.rxjava3.operators.FlowableTransformers
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
@@ -26,7 +24,8 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
     private lateinit var coordinatesModel: Coordinates
     private lateinit var retrofit: Retrofit
     private lateinit var request: ICoordinatesRequest
-    private var trackingEnable: Boolean = true
+    private var trackingEnable: Boolean = false
+    private var trackingStarted: Boolean = false
     private val valve = PublishProcessor.create<Boolean>()
 
 
@@ -61,14 +60,15 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
 
     override fun startTracking() {
         val count: Long = coordinatesModel.getCoordinates().size.toLong()
-        Flowable.interval(1, TimeUnit.SECONDS)
+        Flowable.interval(500, TimeUnit.MILLISECONDS)
             .compose(FlowableTransformers.valve(valve, true))
             .take(count)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { positionNumber ->
                 view?.genNewPoint(coordinatesModel.getCoordinates()[positionNumber.toInt()])
                 }
-
+        view?.showMessage("Поехали!")
+        trackingStarted = true
     }
 
     private val parseResponseFromServer: Function<String, Coordinates> =
@@ -85,11 +85,17 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
             coordinates
         }
 
-    override fun switchTracking(enable: Boolean) {
+    override fun switchTracking() {
         trackingEnable = !trackingEnable
+        if (!trackingEnable) {
+            view?.showMessage("Перекур!")
+        } else {
+            view?.showMessage("Поехали!")
+        }
         valve.onNext(trackingEnable)
     }
-    fun getTracking(): Boolean {return trackingEnable}
+
+    override fun getTracking(): Boolean {return trackingStarted}
 }
 
 

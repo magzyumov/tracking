@@ -16,7 +16,8 @@ interface IMainContract: IBaseContract.View {
         fun init()
         fun getCoordinates()
         fun startTracking()
-        fun switchTracking(enable: Boolean)
+        fun switchTracking()
+        fun getTracking(): Boolean
     }
 
 }
