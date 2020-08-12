@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val handler = Handler()
         val start = SystemClock.uptimeMillis()
         val interpolator: Interpolator = AccelerateDecelerateInterpolator()
-        val durationInMs = 200f
+        val durationInMs = 500f
         handler.post(object: Runnable {
             var elapsed: Long = 0
             var t = 0f
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 t = elapsed / durationInMs
                 v = interpolator.getInterpolation(t)
                 marker.position = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 20f));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 15f));
 
                 // Repeat till progress is complete.
                 if (t < 1) {

@@ -60,7 +60,7 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
 
     override fun startTracking() {
         val count: Long = coordinatesModel.getCoordinates().size.toLong()
-        Flowable.interval(500, TimeUnit.MILLISECONDS)
+        Flowable.interval(1, TimeUnit.SECONDS)
             .compose(FlowableTransformers.valve(valve, true))
             .take(count)
             .observeOn(AndroidSchedulers.mainThread())
