@@ -116,7 +116,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun genNewPoint(coordinate: Coordinate) {
         animateMarkerToGB(startMarker, coordinate.getPoint())
-        println(coordinate.getTimeStamp())
     }
 
     override fun onClick(p0: View?) {
