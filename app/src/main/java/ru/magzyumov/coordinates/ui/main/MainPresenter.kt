@@ -48,7 +48,7 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object: DisposableSingleObserver<Coordinates>() {
                 override fun onSuccess(coordinates: Coordinates) {
-                    coordinatesModel.setCoordinates(coordinates.getCoordinates()!!)
+                    coordinatesModel.setCoordinates(coordinates.getCoordinates())
                     view?.showMessage("Данные готовы!")
                     view?.dataReady(coordinatesModel)
                 }

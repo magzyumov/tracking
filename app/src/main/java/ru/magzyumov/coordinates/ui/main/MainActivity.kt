@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 t = elapsed / durationInMs
                 v = interpolator.getInterpolation(t)
                 marker.position = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 15f));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 17f));
 
                 // Repeat till progress is complete.
                 if (t < 1) {
