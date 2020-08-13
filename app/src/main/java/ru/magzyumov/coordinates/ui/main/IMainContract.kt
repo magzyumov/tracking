@@ -14,9 +14,7 @@ interface IMainContract: IBaseContract.View {
 
     interface Presenter: IBaseContract.Presenter<View> {
         fun getCoordinates()
-        fun startTracking()
         fun switchTracking()
-        fun getTrackingStatus(): Boolean
     }
 
 }

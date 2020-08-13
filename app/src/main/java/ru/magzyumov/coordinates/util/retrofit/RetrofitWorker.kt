@@ -1,13 +1,13 @@
 package ru.magzyumov.coordinates.util.retrofit
 
 import com.google.android.gms.maps.model.LatLng
-import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
-import io.reactivex.rxjava3.functions.Function
-import io.reactivex.rxjava3.observers.DisposableSingleObserver
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
+
 import org.json.JSONArray
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 import ru.magzyumov.coordinates.model.Coordinates
@@ -23,7 +23,7 @@ class RetrofitWorker {
         retrofit = Retrofit.Builder()
             .baseUrl("https://kz.skif.me/")
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
 
         request = retrofit.create(ICoordinatesRequest::class.java)
@@ -60,8 +60,8 @@ class RetrofitWorker {
         }
     }
 
-    private val parseResponseFromServer: Function<String, Coordinates> =
-        Function { jsonCoordinates: String ->
+    private val parseResponseFromServer: Function1<String, Coordinates> =
+         { jsonCoordinates: String ->
 
             var coordinates = Coordinates()
             val jsonArray = JSONArray(jsonCoordinates)
@@ -76,4 +76,6 @@ class RetrofitWorker {
             }
             coordinates
         }
+
+
 }

@@ -118,10 +118,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     }
     
     override fun onMapClick(p0: LatLng?) {
-        if (!presenter?.getTrackingStatus()!!) {
-            presenter?.startTracking()
-        }
-
         presenter?.switchTracking()
     }
 

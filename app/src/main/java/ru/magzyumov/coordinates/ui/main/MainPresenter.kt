@@ -1,9 +1,8 @@
 package ru.magzyumov.coordinates.ui.main
 
-import hu.akarnokd.rxjava3.operators.FlowableTransformers
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.processors.PublishProcessor
+import android.annotation.SuppressLint
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import ru.magzyumov.coordinates.model.Coordinates
 import ru.magzyumov.coordinates.ui.base.BasePresenter
 import ru.magzyumov.coordinates.util.Calculations
@@ -18,9 +17,8 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
     private var coordinatesModel: Coordinates
     private var retrofitWorker: RetrofitWorker
     private var trackingEnable: Boolean = false
-    private var trackingStarted: Boolean = false
-    private val valve = PublishProcessor.create<Boolean>()
     private var calculations: Calculations
+    private var position: Long = 0
 
     init {
         coordinatesModel = Coordinates()
@@ -33,13 +31,31 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
         retrofitWorker.getCoordinates()
     }
 
-    override fun startTracking() {
-        val count: Long = coordinatesModel.getCoordinates().size.toLong()
-        Flowable.interval(1, TimeUnit.SECONDS)
-            .compose(FlowableTransformers.valve(valve, true ))
-            .take(count)
+    override fun takeDataFromServer(coordinates: Coordinates) {
+        coordinatesModel = coordinates
+        view?.dataReady(coordinatesModel)
+        retrofitWorker.removeListeners(this)
+    }
+
+    override fun sendInfo(message: String) {
+        view?.showMessage(message)
+    }
+
+    @SuppressLint("CheckResult")
+    override fun switchTracking(){
+        val count: Long = coordinatesModel.getCoordinates().size.toLong() - 1
+
+        trackingEnable = !trackingEnable
+        when (trackingEnable) {
+            true -> view?.showMessage("Поехали!")
+            false -> view?.showMessage("Перекур!")
+        }
+
+        Observable.intervalRange(position, count - position, 0, 1, TimeUnit.SECONDS)
+            .takeWhile {trackingEnable}
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { positionNumber ->
+                position = positionNumber
                 if (positionNumber > 1) {
                     var speed = calculations.getSpeed(
                         coordinatesModel.getCoordinates()[positionNumber.toInt() - 1],
@@ -49,31 +65,6 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
                 }
                 view?.genNewPoint(coordinatesModel.getCoordinates()[positionNumber.toInt()])
             }
-        view?.showMessage("Поехали!")
-        trackingStarted = true
-    }
-
-    override fun switchTracking() {
-        trackingEnable = !trackingEnable
-
-        if (!trackingEnable) {
-            view?.showMessage("Перекур!")
-        } else {
-            view?.showMessage("Поехали!")
-        }
-        valve.onNext(trackingEnable)
-    }
-
-    override fun getTrackingStatus(): Boolean {return trackingStarted}
-
-    override fun takeDataFromServer(coordinates: Coordinates) {
-        coordinatesModel = coordinates
-        view?.dataReady(coordinatesModel)
-        retrofitWorker.removeListeners(this)
-    }
-
-    override fun sendInfo(message: String) {
-        view?.showMessage(message)
     }
 }
 
