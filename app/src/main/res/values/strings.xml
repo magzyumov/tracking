@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">Coordinates</string>
+    <string name="app_name">Track logger</string>
+
+    <string name="success">Success</string>
+    <string name="start">Go!</string>
+    <string name="pause">Pause</string>
+    <string name="speed">Speed: %s m/s</string>
+    <string name="trackReady">Track is ready</string>
+    <string name="dataPreparation">Data preparation…</string>
+    <string name="finish">End of track reached</string>
+
+
+
 </resources>

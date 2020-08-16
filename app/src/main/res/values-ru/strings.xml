@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Просмотр трека</string>
+
+    <string name="success">Успех</string>
+    <string name="start">Поехали!</string>
+    <string name="pause">Перекур!</string>
+    <string name="speed">Скорость: %s м/с</string>
+    <string name="trackReady">Маршрут готов</string>
+    <string name="dataPreparation">Подготовка данных…</string>
+    <string name="finish">Достигнут конец маршрута</string>
+
+</resources>

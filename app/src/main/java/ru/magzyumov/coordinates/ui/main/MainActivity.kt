@@ -1,10 +1,11 @@
 package ru.magzyumov.coordinates.ui.main
 
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -14,13 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_main.*
-import ru.magzyumov.coordinates.util.LatLngInterpolator
 import ru.magzyumov.coordinates.R
 import ru.magzyumov.coordinates.model.Coordinates
 import ru.magzyumov.coordinates.model.Coordinates.Coordinate
+import ru.magzyumov.coordinates.util.LatLngInterpolator
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, 
+class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     GoogleMap.OnMapClickListener, IMainContract.View {
 
     private lateinit var map: GoogleMap
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        textViewSpeed.text = "Подготовка данных..."
+        textViewSpeed.text = getString(R.string.dataPreparation)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -75,25 +76,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
     private fun moveMarker(marker: Marker, finalPosition: LatLng) {
-        val latLngInterpolator: LatLngInterpolator = LatLngInterpolator.Spherical()
+        val latLngInterpolator: LatLngInterpolator = LatLngInterpolator.LinearFixed()
         val startPosition = marker.position
         val handler = Handler()
         val start = SystemClock.uptimeMillis()
         val interpolator: Interpolator = AccelerateDecelerateInterpolator()
-        val durationInMs = 500f
+        val durationInMs = 300f
         handler.post(object: Runnable {
-            var elapsed: Long = 0
-            var t = 0f
-            var v = 0f
             override fun run() {
-                elapsed = SystemClock.uptimeMillis() - start
-                t = elapsed / durationInMs
-                v = interpolator.getInterpolation(t)
+                val elapsed = SystemClock.uptimeMillis() - start
+                val t = elapsed / durationInMs
+                val v = interpolator.getInterpolation(t)
                 marker.position = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 20f));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 16f))
 
                 if (t < 1) {
-                    handler.postDelayed(this, 10)
+                    handler.postDelayed(this, 16)
                 }
             }
         })
@@ -104,17 +102,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         progressBar.visibility = GONE
         mapFrame.visibility = VISIBLE
         drawRoute()
-        textViewSpeed.text = "Маршрут готов!"
+        textViewSpeed.text = getString(R.string.trackReady)
     }
 
     override fun showMessage(message: String) {
         Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
     }
 
-    @SuppressLint("SetTextI18n")
+
     override fun genNewPoint(coordinate: Coordinate) {
         moveMarker(startMarker, coordinate.getPoint())
-        textViewSpeed.text = "Скорость: " + coordinate.getSpeed() + " м/ч"
+        var speed = String.format(getString(R.string.speed), coordinate.getSpeed())
+        textViewSpeed.text = speed
     }
     
     override fun onMapClick(p0: LatLng?) {
