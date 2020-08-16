@@ -11,6 +11,7 @@ import ru.magzyumov.coordinates.util.Calculations
 import ru.magzyumov.coordinates.util.ResourceManager
 import ru.magzyumov.coordinates.util.retrofit.IRetrofitWorker
 import ru.magzyumov.coordinates.util.retrofit.RetrofitWorker
+import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

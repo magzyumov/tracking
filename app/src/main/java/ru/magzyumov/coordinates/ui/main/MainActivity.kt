@@ -1,11 +1,9 @@
 package ru.magzyumov.coordinates.ui.main
 
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -97,8 +95,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         })
     }
 
-    override fun dataReady(_coordinates: Coordinates) {
-        coordinates = _coordinates
+    override fun dataReady(coordinates: Coordinates) {
+        this.coordinates = coordinates
         progressBar.visibility = GONE
         mapFrame.visibility = VISIBLE
         drawRoute()

@@ -9,12 +9,12 @@ class Coordinates {
     fun setCoordinates(_coordinates: ArrayList<Coordinate>) {coordinates = _coordinates}
 
     class Coordinate(_timeStamp: String, _point: LatLng, _speed: Int = 0) {
-        private var timeStamp =_timeStamp
-        private var point = _point
+        private var timeStamp: String =_timeStamp
+        private var point: LatLng = _point
         private var speed: Int = _speed
 
 
-        fun getTimeStamp(): String? {return timeStamp }
+        fun getTimeStamp(): String {return timeStamp }
         fun setTimeStamp(_timeStamp: String) {timeStamp = _timeStamp}
 
         fun getPoint(): LatLng {return point }

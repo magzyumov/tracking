@@ -24,7 +24,7 @@ class RetrofitWorker {
             .baseUrl("https://kz.skif.me/")
             .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
+            .build()
 
         request = retrofit.create(ICoordinatesRequest::class.java)
     }
@@ -63,13 +63,14 @@ class RetrofitWorker {
     private val parseResponseFromServer: Function1<String, Coordinates> =
          { jsonCoordinates: String ->
 
-            var coordinates = Coordinates()
+            val coordinates = Coordinates()
+
             val jsonArray = JSONArray(jsonCoordinates)
 
             for (i in 0 until jsonArray.length()) {
                 val innerJsonArray = jsonArray.getJSONArray(i)
 
-                var coordinate = Coordinate(innerJsonArray.getString(0),
+                val coordinate = Coordinate(innerJsonArray.getString(0),
                     LatLng(innerJsonArray.getString(1).toDouble(), innerJsonArray.getString(2).toDouble()))
 
                 coordinates.getCoordinates().add(coordinate)

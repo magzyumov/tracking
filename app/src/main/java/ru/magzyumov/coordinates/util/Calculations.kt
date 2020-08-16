@@ -1,42 +1,48 @@
 package ru.magzyumov.coordinates.util
 
-import ru.magzyumov.coordinates.model.Coordinates
+import ru.magzyumov.coordinates.model.Coordinates.Coordinate
 import java.text.SimpleDateFormat
 import java.lang.Math.*
 import java.util.*
 
 class Calculations {
 
-    fun getSpeed(coordinateStart: Coordinates.Coordinate, coordinateEnd: Coordinates.Coordinate): Int{
+    fun getSpeed(coordinateStart: Coordinate, coordinateEnd: Coordinate): Int{
         return getDistance(coordinateStart, coordinateEnd) / getDuration(coordinateStart, coordinateEnd)
     }
 
-    fun getDistance(coordinateStart: Coordinates.Coordinate, coordinateEnd: Coordinates.Coordinate): Int {
-        val earthRadiusKm = 6378.1370;
+    fun getDistance(coordinateStart: Coordinate, coordinateEnd: Coordinate): Int {
+        val earthRadiusKm = 6378.1370
         val d2R = PI / 180.0
 
-        var lat1 = coordinateStart.getPoint().latitude
-        var lat2 = coordinateEnd.getPoint().latitude
-        var lon1 = coordinateStart.getPoint().longitude
-        var lon2 = coordinateEnd.getPoint().longitude
+        val lat1 = coordinateStart.getPoint().latitude
+        val lat2 = coordinateEnd.getPoint().latitude
+        val lon1 = coordinateStart.getPoint().longitude
+        val lon2 = coordinateEnd.getPoint().longitude
 
-        var dLon = (lon2-lon1) * d2R
-        var dLat = (lat2-lat1) * d2R
+        val dLon = (lon2-lon1) * d2R
+        val dLat = (lat2-lat1) * d2R
 
-        val a = Math.pow(sin(dLat / 2.0), 2.0 ) + (Math.cos(lat1 * d2R) * cos(lat2 * d2R) * pow(sin(dLon / 2.0), 2.0))
-        val c = 2.0 * atan2(Math.sqrt(a), sqrt(1.0 - a))
+        val a = pow(sin(dLat / 2.0), 2.0 ) + (cos(lat1 * d2R) * cos(lat2 * d2R) * pow(sin(dLon / 2.0), 2.0))
+        val c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
         val d: Double = earthRadiusKm * c
 
         return (1000.0 * d).toInt()
     }
 
-    fun getDuration(coordinateStart: Coordinates.Coordinate, coordinateEnd: Coordinates.Coordinate): Int{
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    fun getDuration(coordinateStart: Coordinate, coordinateEnd: Coordinate): Int{
+        var result = 0
 
-        val startDate: Date = dateFormat.parse(coordinateStart.getTimeStamp())
-        val endDate: Date = dateFormat.parse(coordinateEnd.getTimeStamp())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-        return ((endDate.time - startDate.time ) / 1000.0).toInt()
+        val startDate = dateFormat.parse(coordinateStart.getTimeStamp())
+        val endDate = dateFormat.parse(coordinateEnd.getTimeStamp())
+
+        if ((startDate != null) && (endDate != null)){
+            result = ((endDate.time - startDate.time ) / 1000.0).toInt()
+        }
+
+        return result
     }
 
 
