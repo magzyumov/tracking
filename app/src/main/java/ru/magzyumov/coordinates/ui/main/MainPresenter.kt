@@ -1,6 +1,5 @@
 package ru.magzyumov.coordinates.ui.main
 
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -59,7 +58,6 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
             true -> {startTrack()}
             false -> {disposable.dispose()}
         }
-
     }
 
     private fun startTrack(){
@@ -95,8 +93,6 @@ class MainPresenter: BasePresenter<IMainContract.View>(), IMainContract.Presente
             }
             )
     }
-
-
 }
 
 
